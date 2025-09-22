@@ -1,0 +1,103 @@
+---
+title: "Linear Regression Analysis of Age and Dementia Onset"
+subtitle: "A deep dive on the relationship between patient age and length before dementia onset"
+author: "Christie Ngo"
+thanks: "Project repository available at: [https://github.com/christiecngo/math261a_project1](https://github.com/christiecngo/math261a_project1)."
+date: today
+date-format: long
+abstract: "Abstract here."
+format: pdf
+bibliography: references.bib
+number-sections: true
+---
+
+    usethis::use_git_config(user.name = "Christie Ngo", user.email = "christiecngo@gmail.com")
+
+
+```{r, echo=FALSE}
+library(dplyr)
+```
+
+{@palmer_penguins}
+
+# Introduction 
+
+Dementia refers to a set of conditions related to cognitive decline with various causes and risk factors (Mayo Clinic 2025). Symptoms may include memory loss, disorientation, poor coordination, depression, and anxiety. As populations all around the world continue to age, the increasing physical and financial impact of dementia is a public health issue that should be thoroughly investigated. In the past, the highest risk factor has been recognized as chronological age as dementia prevalence increases with it (Daviglus et al., 2010). However, subsequent research suggests that subjective age, the difference between one's biological age and how old they feel, may hold greater influence on risk of dementia (Kotter-Grühn et al., 2015). 
+
+Because dementia is a complicated condition, a simple linear regression model with the predictor variable of age will be insufficient in capturing nuanced associations but serves as a valuable starting point. Previous research tackled dementia modeling more holistically, but it remains important to fully understand the relationship with biological age. Subjective age is a qualitative assessment and is often not reported; this report aims to isolate the usefulness of considering biological age for determining time of dementia onset.
+
+A simple linear regression model revealed that using age alone only accounts for a trivial proportion of relationship between dementia onset duration and biological age. Only approximately 5% of the variation in onset length was explained after factoring in age. Another meaningful discovery includes the lack of linear association between these variables based on visual assessment of residuals. Because of the low explainability from this simple linear regression model, more complex models that include interaction terms and data transformations may see greater success in inference of dementia onset.
+
+# Data {#sec-data}
+
+The data is a subset from the Korea Health Panel (KHP) surveys (2006-2018). This computer-assisted data collection process is conducted by the Korea Institute for Health and Social Affairs and the National Health Insurance Service (NHIS); it occurs annually for households selected using clustered probability sampling on population census data (Chung 2022). Alternative sources of this survey would include more participants of interest with other additional health factors included. There are 10811 rows of observations, each unit representing participant responses during each survey wave since the study started. Participants, with unique identifiers, are all over 65 years old and may have multiple rows listed if they have been observed for more than one period. The cohort also includes many seniors who have not developed dementia. 
+
+```{r, echo=FALSE}
+hist(dementia$age, xlab="Age of Participants at Baseline before Dementia (years)", main="Histogram of Dementia Participant Baseline Age")
+hist(dementia$time_dementia, xlab="Numbers of Days Until Dementia Onset", main="Historgram of Time Until Dementia Onset in Days")
+```
+
+# Methods
+
+All data preprocessing and model fitting were completed using R programming.
+
+The motivation for using a simple linear regression model is to utilize a formal mean to express a statistical relationship between two variables, where there is a probability distribution for the response $Y$ for each level of predictor $X$; the means for the probability distributions vary with $X$ in a systematic way (Kutner et al., 2005). A linear regression model is considered "simple" when there is only one predictor variable. The chosen model is linear in both parameters and predictor variables because all parameters appear without a mathematical operation and the predictor exists only in the first power. In our case, the sole predictor is the age of the participant at the baseline before the onset of dementia. Our measured response is duration in days before the onset of dementia from the initial baseline date. This overall model takes the form:
+
+$$Y_i = \beta_0 + \beta_1X_i + \epsilon_i$$
+Since $E{Y_i} = E\{\beta_0 + \beta_1X_i + \epsilon_i \} = \beta_0+\beta_1X_i + E\{\epsilon_i\} = \beta_0+\epsilon_1X_i$
+
+$\sigma^2\{\beta_0 + \beta_1X_i + \epsilon_i\} = \sigma^2\{\epsilon_i\} = \sigma^2$
+
+Residuals:
+
+SSTO = SSR + SSE 
+
+$$\sum (Y_i-\bar{Y})^2 = \sum (\hat{Y_i}-\bar{X})^2 + \sum(Y_i-\hat{Y_i})$$
+
+$$R^2 = \frac{SSR}{SSTO} = 1 - \frac{SSE}{SSTO}$$
+
+# Results
+
+# Discussion
+
+# References
+
+* https://www.sciencedirect.com/science/article/abs/pii/S0022395617310233
+
+* https://www.mayoclinic.org/diseases-conditions/dementia/symptoms-causes/syc-20352013
+
+* https://www.frontiersin.org/journals/public-health/articles/10.3389/fpubh.2022.828318/full?utm_source=chatgpt.com
+
+
+ChatGPT for help understanding the numeric variable coding.
+
+```{r, echo=FALSE}
+dementia = read.csv("dementia.csv")
+
+df_onset <- dementia %>%
+  filter(dementia_new == 1) %>%      # only the row where dementia starts
+  group_by(id) %>%
+  filter(date == min(date)) %>%      # keep first onset
+  ungroup()
+```
+
+```{r, echo=FALSE}
+plot(df_onset$age, df_onset$time_dementia)
+```
+
+```{r, echo=FALSE}
+lm_fit = lm(time_dementia ~ age, data=df_onset)
+summary(lm_fit)
+```
+
+```{r, echo=FALSE}
+plot(lm_fit$fitted.values, lm_fit$residuals,
+     xlab="Fitted values", ylab="Residuals",
+     main="Residuals vs Fitted")
+abline(h=0, col="red")
+```
+
+```{r, echo=FALSE}
+qqnorm(lm_fit$residuals)
+qqline(lm_fit$residuals, col="red")
+```
