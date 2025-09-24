@@ -5,73 +5,15 @@ author: "Christie Ngo"
 thanks: "Project repository available at: [https://github.com/christiecngo/math261a_project1](https://github.com/christiecngo/math261a_project1)."
 date: today
 date-format: long
-abstract: "Abstract here."
+abstract: "Dementia is a multifacted set of conditions whose prevalence is strongly associated with age. A simple linear regression model on Korea Health Panel survey data using biological age is constructed to examine the isolated influence on dementia onset duration. Results show a lack of linear relationship, with age alone only explaining a small proportion of the variation in time until onset. Future studies of age's impact on dementia require more complex modeling techniques and data transformations."
 format: pdf
 bibliography: references.bib
 number-sections: true
 ---
 
-    usethis::use_git_config(user.name = "Christie Ngo", user.email = "christiecngo@gmail.com")
-
-
-```{r, echo=FALSE}
+```{r, warning=FALSE, message=FALSE, echo=FALSE}
 library(dplyr)
-```
 
-{@palmer_penguins}
-
-# Introduction 
-
-Dementia refers to a set of conditions related to cognitive decline with various causes and risk factors (Mayo Clinic 2025). Symptoms may include memory loss, disorientation, poor coordination, depression, and anxiety. As populations all around the world continue to age, the increasing physical and financial impact of dementia is a public health issue that should be thoroughly investigated. In the past, the highest risk factor has been recognized as chronological age as dementia prevalence increases with it (Daviglus et al., 2010). However, subsequent research suggests that subjective age, the difference between one's biological age and how old they feel, may hold greater influence on risk of dementia (Kotter-Grühn et al., 2015). 
-
-Because dementia is a complicated condition, a simple linear regression model with the predictor variable of age will be insufficient in capturing nuanced associations but serves as a valuable starting point. Previous research tackled dementia modeling more holistically, but it remains important to fully understand the relationship with biological age. Subjective age is a qualitative assessment and is often not reported; this report aims to isolate the usefulness of considering biological age for determining time of dementia onset.
-
-A simple linear regression model revealed that using age alone only accounts for a trivial proportion of relationship between dementia onset duration and biological age. Only approximately 5% of the variation in onset length was explained after factoring in age. Another meaningful discovery includes the lack of linear association between these variables based on visual assessment of residuals. Because of the low explainability from this simple linear regression model, more complex models that include interaction terms and data transformations may see greater success in inference of dementia onset.
-
-# Data {#sec-data}
-
-The data is a subset from the Korea Health Panel (KHP) surveys (2006-2018). This computer-assisted data collection process is conducted by the Korea Institute for Health and Social Affairs and the National Health Insurance Service (NHIS); it occurs annually for households selected using clustered probability sampling on population census data (Chung 2022). Alternative sources of this survey would include more participants of interest with other additional health factors included. There are 10811 rows of observations, each unit representing participant responses during each survey wave since the study started. Participants, with unique identifiers, are all over 65 years old and may have multiple rows listed if they have been observed for more than one period. The cohort also includes many seniors who have not developed dementia. 
-
-```{r, echo=FALSE}
-hist(dementia$age, xlab="Age of Participants at Baseline before Dementia (years)", main="Histogram of Dementia Participant Baseline Age")
-hist(dementia$time_dementia, xlab="Numbers of Days Until Dementia Onset", main="Historgram of Time Until Dementia Onset in Days")
-```
-
-# Methods
-
-All data preprocessing and model fitting were completed using R programming.
-
-The motivation for using a simple linear regression model is to utilize a formal mean to express a statistical relationship between two variables, where there is a probability distribution for the response $Y$ for each level of predictor $X$; the means for the probability distributions vary with $X$ in a systematic way (Kutner et al., 2005). A linear regression model is considered "simple" when there is only one predictor variable. The chosen model is linear in both parameters and predictor variables because all parameters appear without a mathematical operation and the predictor exists only in the first power. In our case, the sole predictor is the age of the participant at the baseline before the onset of dementia. Our measured response is duration in days before the onset of dementia from the initial baseline date. This overall model takes the form:
-
-$$Y_i = \beta_0 + \beta_1X_i + \epsilon_i$$
-Since $E{Y_i} = E\{\beta_0 + \beta_1X_i + \epsilon_i \} = \beta_0+\beta_1X_i + E\{\epsilon_i\} = \beta_0+\epsilon_1X_i$
-
-$\sigma^2\{\beta_0 + \beta_1X_i + \epsilon_i\} = \sigma^2\{\epsilon_i\} = \sigma^2$
-
-Residuals:
-
-SSTO = SSR + SSE 
-
-$$\sum (Y_i-\bar{Y})^2 = \sum (\hat{Y_i}-\bar{X})^2 + \sum(Y_i-\hat{Y_i})$$
-
-$$R^2 = \frac{SSR}{SSTO} = 1 - \frac{SSE}{SSTO}$$
-
-# Results
-
-# Discussion
-
-# References
-
-* https://www.sciencedirect.com/science/article/abs/pii/S0022395617310233
-
-* https://www.mayoclinic.org/diseases-conditions/dementia/symptoms-causes/syc-20352013
-
-* https://www.frontiersin.org/journals/public-health/articles/10.3389/fpubh.2022.828318/full?utm_source=chatgpt.com
-
-
-ChatGPT for help understanding the numeric variable coding.
-
-```{r, echo=FALSE}
 dementia = read.csv("dementia.csv")
 
 df_onset <- dementia %>%
@@ -82,22 +24,76 @@ df_onset <- dementia %>%
 ```
 
 ```{r, echo=FALSE}
+lm_fit = lm(time_dementia ~ age, data=df_onset)
+```
+
+# Introduction 
+
+Dementia refers to a set of conditions related to cognitive decline with various causes and risk factors (@noauthor_dementia_nodate). Symptoms may include memory loss, disorientation, poor coordination, depression, and anxiety. As populations all around the world continue to age, the increasing physical and financial impact of dementia is a public health issue that should be thoroughly investigated. In the past, the highest risk factor has been recognized as chronological age as dementia prevalence increases with it (@daviglus2010preventing). However, subsequent research suggests that subjective age, the difference between one's biological age and how old they feel, may hold greater influence on risk of dementia (@kottergruhn2015looking). 
+
+Because dementia is a complicated condition, a simple linear regression model with the predictor variable of age will be insufficient in capturing nuanced associations but serves as a valuable starting point. Previous research tackled dementia modeling more holistically, but it remains important to fully understand the relationship with biological age. Subjective age is a qualitative assessment and is often not reported. In China, a team of researchers studied dementia risk among rural seniors using Cox models but kept education, marital status, self-rated AD8 score, and stroke history in addition to age (@liu_development_2025).
+
+This paper aims to isolate the usefulness of considering the more widely available demographic, biological age, for determining time of dementia onset. We will first introduce the dementia study dataset of interest followed by construction of a simple linear regression model. After this, we assess the model's fit and discuss implications of these results.
+
+
+
+# Data {#sec-data}
+
+The data is a subset from the Korea Health Panel (KHP) surveys from 2006 to 2018 (@DVN/ANLJSG_2025). This computer-assisted data collection process is conducted by the Korea Institute for Health and Social Affairs and the National Health Insurance Service (NHIS); it occurs annually for households selected using clustered probability sampling on population census data (Chung 2022). More comprehensive alternative sources of this survey would include more participants of interest with other additional survey responses included. There are 10811 rows of observations, each unit representing participant responses during each survey wave since the study started. Participants, with unique identifiers, are all over 65 years old and may have multiple rows listed if they have been observed for more than one period. The cohort also includes many seniors who have not developed dementia. 
+
+For the question of interest, filtering this dataset to only participants who ended up developing dementia led to only 2% of the cohort remaining. It should be noted that the interquartile range of biological age at baseline is only 7 years. The data is extremely right skewed. 65 year olds who are included in the study may already exhibit other risk factors that group them with older participants. The distribution of dementia onset days is almost uniform with a small peak in the middle of the range and a large one near the maximum. 
+
+```{r, echo=FALSE}
+hist(dementia$age, xlab="Age of Participants at Baseline before Dementia (years)", main="Histogram of Dementia Participant Baseline Age")
+hist(dementia$time_dementia, xlab="Numbers of Days Until Dementia Onset", main="Historgram of Time Until Dementia Onset in Days")
+```
+
+# Methods
+
+Model fitting was completed using R's "lm()" function and data was preprocessed with help of the package "dplyr". The final cohort is obtained by filtering for the earliest instance of a dementia recording for patients with dementia. This led to a data size of 216 distinct participants.
+
+
+```{r, echo=FALSE}
 plot(df_onset$age, df_onset$time_dementia)
 ```
 
-```{r, echo=FALSE}
-lm_fit = lm(time_dementia ~ age, data=df_onset)
-summary(lm_fit)
-```
+The motivation for using a simple linear regression model is to utilize a formal mean to express a statistical relationship between two variables, where there is a probability distribution for the response $Y$ for each level of predictor $X$; the means for the probability distributions vary with $X$ in a systematic way (Kutner et al., 2005). A linear regression model is considered "simple" when there is only one predictor variable. The chosen model is linear in both parameters and predictor variables because all parameters appear without a mathematical operation and the predictor exists only in the first power. In our case, the sole predictor is the age of the participant at the baseline before the onset of dementia. Our measured response is duration in days before the onset of dementia from the initial baseline date. This overall model takes the form:
 
-```{r, echo=FALSE}
+$$Y_i = \beta_0 + \beta_1X_i + \epsilon_i$$
+$i$ ranges from 1 to the number of observations in the dataset. The term $\epsilon_i$ captures the noise or randomness within the real-world observations that is not included in the regression model. $\beta_0$ is the intercept that corresponds to the value if the participant's age were 0. $\beta_1$ is the slope of the model, representing the change in response $Y$ when there is a unit increase in predictor $X$.
+
+In order to consider how well our linear regression model fit the data, we will consider residuals. Residuals are the difference between the actual observed value and what the linear regression predicted. They are given by this formula: $$e_i = Y_i - \hat{Y_i}$$
+
+Summing up all residuals will give us the SSE, or error sum of squares. SSR is the regression sum of squares and accounts for the variation of the fitted values around the mean of observed values. SSTO is the total sum of squares, a combination of the two previous metrics.
+
+$$SSTO = SSR + SSE$$
+
+$$\sum (Y_i-\bar{Y})^2 = \sum (\hat{Y_i}-\bar{X})^2 + \sum(Y_i-\hat{Y_i})$$
+
+The amount of deviation explained by SSR, or regression line, out of the total deviation gives rise to the $R^2$ metric. We will be using this to determine how well the model fits the data.
+
+$$R^2 = \frac{SSR}{SSTO} = 1 - \frac{SSE}{SSTO}$$
+
+# Results
+
+A simple linear regression model revealed that using age alone only accounts for a trivial proportion of relationship between dementia onset duration and biological age. Only approximately 5% of the variation in onset length was explained after factoring in age ($R^2$= `r summary(lm_fit)$r.squared`). Another meaningful discovery includes the lack of linear association between these variables based on visual assessment of residuals in @fig-residual_plot. The QQ-plot is likewise showing a lack of linear relationship (@fig-qqplot). However, the summary report of the linear model does reveal a notable negative association between participant's biological age and the time it takes for them to develop dementia. $\beta_1$ is `r `lm_fit$coefficients[2]`, meaning that there is a 43 day decrease in dementia onset time for a 1 year increase in age. This comes a significant p-value of `r summary(lm_fit)$coefficients["age", "Pr(>|t|)"]`. 
+
+```{r fig-residual_plot, fig.cap="The residuals of the linear regression model are not randomly scattered", echo=FALSE}
 plot(lm_fit$fitted.values, lm_fit$residuals,
      xlab="Fitted values", ylab="Residuals",
-     main="Residuals vs Fitted")
+     main="Residuals vs. Fitted")
 abline(h=0, col="red")
 ```
 
-```{r, echo=FALSE}
+
+```{r fig-qqplot, fig.cap="The QQ-plot shows curvature towards the tail ends", echo=FALSE}
 qqnorm(lm_fit$residuals)
 qqline(lm_fit$residuals, col="red")
 ```
+
+
+# Discussion
+
+Ultimately, because of the low explainability from this simple linear regression model, more advanced models that include interaction terms and data transformations may see greater success in inference of dementia onset using a participant's demographics. Though age has a significant positive association, there is still a lack of ability to predict dementia onset duration. Due to linear assumption violations, nonparametric techniques can yield greater results. Our limited dataset of dementia participants hinders the generalizability of these regression results. Additionally, since age is a factor that can contribute intricate relationships with other comorbidities, studying interaction terms can help improve the model. 
+
+# References
