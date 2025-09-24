@@ -52,6 +52,8 @@ hist(dementia$time_dementia, xlab="Numbers of Days Until Dementia Onset", main="
 
 Model fitting was completed using R's "lm()" function and data was preprocessed with help of the package "dplyr". The final cohort is obtained by filtering for the earliest instance of a dementia recording for patients with dementia. This led to a data size of 216 distinct participants.
 
+@openai_chatgpt was also used to better understand statistical concepts.
+
 
 ```{r, echo=FALSE}
 plot(df_onset$age, df_onset$time_dementia)
