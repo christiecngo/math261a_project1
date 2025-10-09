@@ -12,9 +12,10 @@ number-sections: true
 ---
 
 ```{r, warning=FALSE, message=FALSE, echo=FALSE}
+
 library(dplyr)
 
-dementia = read.csv("dementia.csv")
+dementia = read.csv("C:/Users/chris/Documents/MAT 261A/Project 1/mat261a_project1/Data/dementia.csv")
 
 df_onset <- dementia %>%
   filter(dementia_new == 1) %>%      # only the row where dementia starts
