@@ -5,7 +5,7 @@ author: "Christie Ngo"
 thanks: "Project repository available at: [https://github.com/christiecngo/math261a_project1](https://github.com/christiecngo/math261a_project1)."
 date: today
 date-format: long
-abstract: "Dementia is a multifacted set of conditions whose prevalence is strongly associated with age. A simple linear regression model on Korea Health Panel survey data using biological age is constructed to examine the isolated influence on dementia onset duration. Results show a lack of linear relationship, with age alone only explaining a small proportion of the variation in time until onset. Future studies of age's impact on dementia require more complex modeling techniques and data transformations."
+abstract: "Dementia is a multifacted set of conditions whose prevalence is strongly associated with age. A simple linear regression model on Korea Health Panel survey data using biological age at the baseline is constructed to examine the isolated influence on time until dementia onset. Results show a lack of linear relationship, with age alone only explaining a small proportion of the variation in time until onset. Future studies of age's impact on dementia require more complex modeling techniques and data transformations."
 format: pdf
 bibliography: references.bib
 number-sections: true
@@ -39,7 +39,7 @@ This paper aims to isolate the usefulness of considering the more widely availab
 
 # Data {#sec-data}
 
-The data is a subset from the Korea Health Panel (KHP) surveys from 2006 to 2018 (@DVN/ANLJSG_2025). This computer-assisted data collection process is conducted by the Korea Institute for Health and Social Affairs and the National Health Insurance Service (NHIS); it occurs annually for households selected using clustered probability sampling on population census data (Chung 2022). More comprehensive alternative sources of this survey would include more participants of interest with other additional survey responses included. There are 10811 rows of observations, each unit representing participant responses during each survey wave since the study started. Participants, with unique identifiers, are all over 65 years old and may have multiple rows listed if they have been observed for more than one period. The cohort also includes many seniors who have not developed dementia. 
+The data is a subset from the Korea Health Panel (KHP) surveys from 2006 to 2018 (@DVN/ANLJSG_2025). This computer-assisted data collection process is conducted by the Korea Institute for Health and Social Affairs and the National Health Insurance Service (NHIS); it occurs annually for households selected using clustered probability sampling on population census data (Chung 2022). More comprehensive alternative sources of this survey would include more participants of interest with other additional survey responses included. There are 10811 rows of observations, each unit representing participant responses during each survey wave since the study started. Participants, with unique identifiers, are all over 65 years old and may have multiple rows listed if they have been observed for more than one period. The original cohort also includes many seniors who have not developed dementia. 
 
 For the question of interest, filtering this dataset to only participants who ended up developing dementia led to only 2% of the cohort remaining. It should be noted that the interquartile range of biological age at baseline is only 7 years. The data is extremely right skewed. 65 year olds who are included in the study may already exhibit other risk factors that group them with older participants. The distribution of dementia onset days is almost uniform with a small peak in the middle of the range and a large one near the maximum. 
 
@@ -50,16 +50,16 @@ hist(dementia$time_dementia, xlab="Numbers of Days Until Dementia Onset", main="
 
 # Methods
 
-Model fitting was completed using R's "lm()" function and data was preprocessed with help of the package "dplyr". The final cohort is obtained by filtering for the earliest instance of a dementia recording for patients with dementia. This led to a data size of 216 distinct participants.
+Model fitting was completed using R's "lm()" function and data was preprocessed with help of the package "dplyr". The final cohort is obtained by filtering for the earliest instance of a dementia recording for patients who eventually developed dementia. This led to a data size of 216 distinct participants.
 
 @openai_chatgpt was also used to better understand statistical concepts.
 
 
 ```{r, echo=FALSE}
-plot(df_onset$age, df_onset$time_dementia)
+plot(df_onset$age, df_onset$time_dementia, col="blue", main="Biological Age vs. Time to Dementia Onset", ylab="Time To Dementia in Days", xlab="Biological Age at Baseline")
 ```
 
-The motivation for using a simple linear regression model is to utilize a formal mean to express a statistical relationship between two variables, where there is a probability distribution for the response $Y$ for each level of predictor $X$; the means for the probability distributions vary with $X$ in a systematic way (@Kutner2005Applied). A linear regression model is considered "simple" when there is only one predictor variable. The chosen model is linear in both parameters and predictor variables because all parameters appear without a mathematical operation and the predictor exists only in the first power. In our case, the sole predictor is the age of the participant at the baseline before the onset of dementia. Our measured response is duration in days before the onset of dementia from the initial baseline date. This overall model takes the form:
+The motivation for using a simple linear regression model is to utilize a formal mean to express a statistical relationship between two variables, where there is a probability distribution for the response $Y$ for each level of predictor $X$; the means for the probability distributions vary with $X$ in a systematic way (@Kutner2005Applied). A linear regression model is considered "simple" when there is only one predictor variable. The chosen model is linear in both parameters and predictor variables because all parameters appear without a mathematical operation and the predictor exists only in the first power. In our case, the sole predictor is the age of the participant at the baseline date before the onset of dementia. Our measured response is duration in days until the onset of dementia from the initial baseline date. This overall model takes the form:
 
 $$Y_i = \beta_0 + \beta_1X_i + \epsilon_i$$
 $i$ ranges from 1 to the number of observations in the dataset. The term $\epsilon_i$ captures the noise or randomness within the real-world observations that is not included in the regression model. $\beta_0$ is the intercept that corresponds to the value if the participant's age were 0. $\beta_1$ is the slope of the model, representing the change in response $Y$ when there is a unit increase in predictor $X$.
@@ -78,9 +78,11 @@ $$R^2 = \frac{SSR}{SSTO} = 1 - \frac{SSE}{SSTO}$$
 
 # Results
 
-A simple linear regression model revealed that using age alone only accounts for a trivial proportion of relationship between dementia onset duration and biological age. Only approximately 5% of the variation in onset length was explained after factoring in age ($R^2$= `r summary(lm_fit)$r.squared`). Another meaningful discovery includes the lack of linear association between these variables based on visual assessment of residuals in @fig-residual_plot. The QQ-plot is likewise showing a lack of linear relationship (@fig-qqplot). However, the summary report of the linear model does reveal a notable negative association between participant's biological age and the time it takes for them to develop dementia. $\beta_1$ is `r lm_fit$coefficients[2]`, meaning that there is a 43 day decrease in dementia onset time for a 1 year increase in age. This comes a significant p-value of `r summary(lm_fit)$coefficients["age", "Pr(>|t|)"]`. 
+A simple linear regression model revealed that using age alone only accounts for a trivial proportion of relationship between dementia onset duration and biological age. Only approximately 5% of the variation in onset length was explained after factoring in age ($R^2$= `r summary(lm_fit)$r.squared`). Because the residuals are mostly randomly scattered, the linear association between these variables seem to mostly hold in @fig-residual_plot. Disregarding a small section on left side of the plot, the rest of the points seem to uphold constant variance. Observations are also independent as we have filtered to a unique entry per participant, each with their own healthcare regime. The QQ-plot is showing only a bit of deviation towards the tail ends, implying normality is mostly unviolated (@fig-qqplot). 
 
-```{r fig-residual_plot, fig.cap="The residuals of the linear regression model are not randomly scattered", echo=FALSE}
+Overall, the summary report of the linear model does reveal a notable negative association between participant's biological age and the time it takes for them to develop dementia. $\beta_1$ is `r lm_fit$coefficients[2]`, meaning that there is an expected decrease of 43 days in dementia onset time for a 1 year increase in age. This comes a significant p-value of `r summary(lm_fit)$coefficients["age", "Pr(>|t|)"]`. 
+
+```{r fig-residual_plot, fig.cap="The residuals of the linear regression model are mostly randomly scattered", echo=FALSE}
 plot(lm_fit$fitted.values, lm_fit$residuals,
      xlab="Fitted values", ylab="Residuals",
      main="Residuals vs. Fitted")
@@ -88,7 +90,7 @@ abline(h=0, col="red")
 ```
 
 
-```{r fig-qqplot, fig.cap="The QQ-plot shows curvature towards the tail ends", echo=FALSE}
+```{r fig-qqplot, fig.cap="The QQ-plot shows only slight curvature towards the tail ends", echo=FALSE}
 qqnorm(lm_fit$residuals)
 qqline(lm_fit$residuals, col="red")
 ```
