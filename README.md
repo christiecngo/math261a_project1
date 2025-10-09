@@ -1,5 +1,7 @@
 # Linear Regression Analysis of Age and Dementia Onset
-Project repository for MATH 261A.
+Date of submission: 10/08/2025
+
+A simple linear regression model investigating the relationship between baseline age at study and time to dementia onset.
 
 ## Data 
 
