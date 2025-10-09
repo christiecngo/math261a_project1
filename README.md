@@ -7,6 +7,13 @@ A simple linear regression model investigating the relationship between baseline
 
 **Example statement:** Data used in this project is obtained from [HARVARD Dataverse](https://dataverse.harvard.edu) who provide the data under the [Creative Commons Public Domain Dedication and License](https://creativecommons.org/publicdomain/zero/1.0/).
 
+## Organization
+
+The "Code" subfolder contains the Quarto file (that generated the report), references.bib, and full R script of code.
+
+"Data" contains the CSV file of dementia participants from the Korean Health Panel.
+
+"Report" contains the full PDF output.
 
 ## External Resources
 
