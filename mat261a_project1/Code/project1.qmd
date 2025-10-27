@@ -1,5 +1,5 @@
 ---
-title: "Linear Regression Analysis of Age and Dementia Onset"
+title: "Linear Regression Analysis Reveal Minimal Association Between Biological Age and Dementia Onset"
 subtitle: "A deep dive on the relationship between patient age and length before dementia onset"
 author: "Christie Ngo"
 thanks: "Project repository available at: [https://github.com/christiecngo/math261a_project1](https://github.com/christiecngo/math261a_project1)."
@@ -40,9 +40,13 @@ This paper aims to isolate the usefulness of considering the more widely availab
 
 # Data {#sec-data}
 
-The data is a subset from the Korea Health Panel (KHP) surveys from 2006 to 2018 (@DVN/ANLJSG_2025). This computer-assisted data collection process is conducted by the Korea Institute for Health and Social Affairs and the National Health Insurance Service (NHIS); it occurs annually for households selected using clustered probability sampling on population census data (Chung 2022). More comprehensive alternative sources of this survey would include more participants of interest with other additional survey responses included. There are 10811 rows of observations, each unit representing participant responses during each survey wave since the study started. Participants, with unique identifiers, are all over 65 years old and may have multiple rows listed if they have been observed for more than one period. The original cohort also includes many seniors who have not developed dementia. 
+The data is a subset from the Korea Health Panel (KHP) surveys from 2006 to 2018 (@DVN/ANLJSG_2025). This computer-assisted data collection process is conducted by the Korea Institute for Health and Social Affairs and the National Health Insurance Service (NHIS); it occurs annually for households selected using clustered probability sampling on population census data (Chung 2022). More comprehensive alternative sources of this survey would include more participants of interest with other additional survey responses included. 
 
-For the question of interest, filtering this dataset to only participants who ended up developing dementia led to only 2% of the cohort remaining. It should be noted that the interquartile range of biological age at baseline is only 7 years. The data is extremely right skewed. 65 year olds who are included in the study may already exhibit other risk factors that group them with older participants. The distribution of dementia onset days is almost uniform with a small peak in the middle of the range and a large one near the maximum. 
+For the question of interest, filtering this dataset to only distinct participants who have developed dementia at some point in the study. This led to only 2% of the original cohort remaining (216/10811 rows). Each row represents one participant's response during each survey wave since the study started. We are only interested in the age of the first recorded onset, discarding all subsequent rows based on unique identifiers; thus, our scope does track the mortality of the participants. The participants are all over 65 years old and may have multiple rows listed if they have been observed for more than one period. The original cohort had included many other seniors who have not developed dementia. 
+
+Because our data was collected using computer technology, we may be excluded results of those in more remote areas and less Internet access. The data is extremely right skewed with the minimum age being 65 years old and median of 70. We cannot extrapolate to earlier onsets of dementia, likely accelerated by other conditions.
+
+It should be noted that the interquartile range of biological age at baseline is only 7 years. The distribution of dementia onset days is almost uniform with a small peak in the middle of the range and a large one near the maximum. 
 
 ```{r, echo=FALSE}
 hist(dementia$age, xlab="Age of Participants at Baseline before Dementia (years)", main="Histogram of Dementia Participant Baseline Age")
@@ -51,7 +55,7 @@ hist(dementia$time_dementia, xlab="Numbers of Days Until Dementia Onset", main="
 
 # Methods
 
-Model fitting was completed using R's "lm()" function and data was preprocessed with help of the package "dplyr". The final cohort is obtained by filtering for the earliest instance of a dementia recording for patients who eventually developed dementia. This led to a data size of 216 distinct participants.
+Model fitting was completed using @R's "lm()" function and data was preprocessed with help of the package "dplyr". The final cohort is obtained by filtering for the earliest instance of a dementia recording for patients who eventually developed dementia. This led to a data size of 216 distinct participants.
 
 @openai_chatgpt was also used to better understand statistical concepts.
 
@@ -79,9 +83,9 @@ $$R^2 = \frac{SSR}{SSTO} = 1 - \frac{SSE}{SSTO}$$
 
 # Results
 
-A simple linear regression model revealed that using age alone only accounts for a trivial proportion of relationship between dementia onset duration and biological age. Only approximately 5% of the variation in onset length was explained after factoring in age ($R^2$= `r summary(lm_fit)$r.squared`). Because the residuals are mostly randomly scattered, the linear association between these variables seem to mostly hold in @fig-residual_plot. Disregarding a small section on left side of the plot, the rest of the points seem to uphold constant variance. Observations are also independent as we have filtered to a unique entry per participant, each with their own healthcare regimen. The QQ-plot is showing only a bit of deviation towards the tail ends, implying normality is mostly unviolated (@fig-qqplot). 
+A simple linear regression model revealed that using age alone only accounts for a trivial proportion of relationship between dementia onset duration and biological age. Only approximately 5% of the variation in onset length was explained after factoring in age ($R^2$= `r summary(lm_fit)$r.squared`). Because the residuals are mostly randomly scattered, the linear association between these variables seem to mostly hold in @fig-residual_plot. Disregarding a small section on left side of the plot, the rest of the points seem to uphold constant variance. Observations are also independent as we have filtered to a unique entry per participant, each with their own healthcare regimen. The QQ-plot is showing only a bit of deviation towards the tail ends, implying normality is mostly unviolated (@fig-qqplot). The red line represents how perfectly the KHP data matches the proposed distribution. 
 
-Overall, the summary report of the linear model does reveal a notable negative association between participant's biological age and the time it takes for them to develop dementia. $\beta_1$ is `r lm_fit$coefficients[2]`, meaning that there is an expected decrease of 43 days in dementia onset time for a 1 year increase in age. This comes a significant p-value of `r summary(lm_fit)$coefficients["age", "Pr(>|t|)"]`. 
+Overall, the summary report of the linear model does reveal a notable negative association between participant's biological age and the time it takes for them to develop dementia. $\beta_1$ is `r lm_fit$coefficients[2]`, meaning that there is an expected decrease of 43 days in dementia onset time for a 1 year increase in age. If we construct a hypothesis test to examine if the slope of age is 0 (that is, there exists a linear association with time to dementia onset), we obtain significant p-value of `r summary(lm_fit)$coefficients["age", "Pr(>|t|)"]`. 
 
 ```{r fig-residual_plot, fig.cap="The residuals of the linear regression model are mostly randomly scattered", echo=FALSE}
 plot(lm_fit$fitted.values, lm_fit$residuals,
