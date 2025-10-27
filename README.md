@@ -19,6 +19,7 @@ The "Code" subfolder contains the Quarto file (that generated the report), refer
 
 The final report and code were written by Christie Ngo, but the following resources were used for preliminary research:
 
+* R Programming Language (RStudio)
 * LLM-based chatbots (ex. ChatGPT Edu)
 
 # Acknowledgments
