@@ -6,7 +6,9 @@ thanks: "Project repository available at: [https://github.com/christiecngo/math2
 date: today
 date-format: long
 abstract: "Dementia is a multifacted set of conditions whose prevalence is strongly associated with age. A simple linear regression model on Korea Health Panel survey data using biological age at the baseline is constructed to examine the isolated influence on time until dementia onset. Results show a lack of linear relationship, with age alone only explaining a small proportion of the variation in time until onset. Future studies of age's impact on dementia require more complex modeling techniques and data transformations."
-format: pdf
+format: 
+  pdf:
+    fig-pos: "H"
 bibliography: references.bib
 number-sections: true
 ---
