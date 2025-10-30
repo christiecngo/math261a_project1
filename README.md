@@ -1,7 +1,7 @@
-# Linear Regression Analysis of Age and Dementia Onset
+# Linear Regression Analysis Reveals Minimal Association Between Biological Age and Dementia Onset
 Date of submission: 10/29/2025
 
-A simple linear regression model investigating the relationship between baseline age at study and time to dementia onset.
+A deep dive on the relationship between patient age and length before dementia onset
 
 ## Data 
 
