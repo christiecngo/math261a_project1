@@ -1,5 +1,5 @@
 # Linear Regression Analysis of Age and Dementia Onset
-Date of submission: 10/08/2025
+Date of submission: 10/29/2025
 
 A simple linear regression model investigating the relationship between baseline age at study and time to dementia onset.
 
@@ -19,8 +19,11 @@ The "Code" subfolder contains the Quarto file (that generated the report), refer
 
 The final report and code were written by Christie Ngo, but the following resources were used for preliminary research:
 
-* R Programming Language (RStudio)
 * LLM-based chatbots (ex. ChatGPT Edu)
+
+## Language
+* R Programming Language (RStudio)
+
 
 # Acknowledgments
 
