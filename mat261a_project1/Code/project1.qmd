@@ -44,14 +44,17 @@ This paper aims to isolate the usefulness of considering the more widely availab
 
 The data is a subset from the Korea Health Panel (KHP) surveys from 2006 to 2018 (@DVN/ANLJSG_2025). This computer-assisted data collection process is conducted by the Korea Institute for Health and Social Affairs and the National Health Insurance Service (NHIS); it occurs annually for households selected using clustered probability sampling on population census data (Chung 2022). More comprehensive alternative sources of this survey would include more participants of interest with other additional survey responses included. 
 
-For the question of interest, filtering this dataset to only distinct participants who have developed dementia at some point in the study. This led to only 2% of the original cohort remaining (216/10811 rows). Each row represents one participant's response during each survey wave since the study started. We are only interested in the age of the first recorded onset, discarding all subsequent rows based on unique identifiers; thus, our scope does track the mortality of the participants. The participants are all over 65 years old and may have multiple rows listed if they have been observed for more than one period. The original cohort had included many other seniors who have not developed dementia. 
+For the question of interest, filtering this dataset to only distinct participants who have developed dementia at some point in the study. This led to only 2% of the original cohort remaining (216/10811 rows). Each row represents one participant's response during each survey wave since the study started. We are only interested in the age of the first recorded onset, discarding all prior and subsequent rows based on participant's unique identifiers; thus, our scope does track the mortality of the participants. The participants are all over 65 years old and may have had multiple rows originally listed if they have been observed for more than one period. The original cohort had also included many other seniors who have not developed dementia, who were all excluded. 
 
 Because our data was collected using computer technology, we may be excluded results of those in more remote areas and less Internet access. The data is extremely right skewed with the minimum age being 65 years old and median of 70. We cannot extrapolate to earlier onsets of dementia, likely accelerated by other conditions.
 
 It should be noted that the interquartile range of biological age at baseline is only 7 years. The distribution of dementia onset days is almost uniform with a small peak in the middle of the range and a large one near the maximum. 
 
-```{r, echo=FALSE}
+```{r, echo=FALSE, fig.cap="A histogram for distribution of participant biological age at baseline recording."}
 hist(dementia$age, xlab="Age of Participants at Baseline before Dementia (years)", main="Histogram of Dementia Participant Baseline Age")
+```
+
+```{r, echo=FALSE, fig.cap="A histogram for the distribution of days until first dementia onset in days."}
 hist(dementia$time_dementia, xlab="Numbers of Days Until Dementia Onset", main="Historgram of Time Until Dementia Onset in Days")
 ```
 
@@ -59,7 +62,7 @@ hist(dementia$time_dementia, xlab="Numbers of Days Until Dementia Onset", main="
 
 Model fitting was completed using @R's "lm()" function and data was preprocessed with help of the package "dplyr". The final cohort is obtained by filtering for the earliest instance of a dementia recording for patients who eventually developed dementia. This led to a data size of 216 distinct participants.
 
-@openai_chatgpt was also used to better understand statistical concepts.
+@openai_chatgpt was also used to better understand implications of linear regression violations.
 
 
 ```{r, echo=FALSE}
@@ -87,13 +90,13 @@ $$R^2 = \frac{SSR}{SSTO} = 1 - \frac{SSE}{SSTO}$$
 
 A simple linear regression model revealed that using age alone only accounts for a trivial proportion of relationship between dementia onset duration and biological age. Only approximately 5% of the variation in onset length was explained after factoring in age ($R^2$= `r summary(lm_fit)$r.squared`). 
 
-If the residual plot is randomly scattered, it implies that the model contributes to errors all around 0, without inherent bias. The linear association between these variables seem to mostly hold in @fig-residual_plot, meaning our linear modeling is appropriate. In order to achieve reliable, accurate confidence intervals and p-values, we require the errors to be independent, normal, and have constant variance. Confidence intervals at level $1-\alpha$ imply that if we repeated sampling, we will capture the true population parameter $(1-\alpha) \%$ of the time. The p-value represents the probability of observing a sample as or more extreme under the null hypothesis. 
+If the residual plot is randomly scattered, it implies that the model contributes to errors all around 0, without bias. Our residuals appear to be randomly scattered; thus, linear modeling is appropriate as shown in @fig-residual_plot, meaning our linear modeling is appropriate. In order to achieve reliable, accurate confidence intervals and p-values, we require the errors to be independent, normal, and have constant variance. Confidence intervals at level $1-\alpha$ imply that repeating the sampling process will result in the true population parameter captured in $(1-\alpha) \%$ of the intervals The p-value represents the probability of observing a sample statistic as or more extreme under the null hypothesis. 
 
-Disregarding a small section on left side of the plot, the rest of the residuals seem to uphold constant variance. Errors are also independent as we have filtered to a unique entry per participant, each with their own healthcare regimen. The QQ-plot is showing only a bit of deviation towards the tail ends, implying normality is mostly unviolated (@fig-qqplot). Its red line represents how perfectly the KHP data matches the proposed normal distribution. 
+Disregarding a small section on left side of the plot, the rest of the residuals seem to uphold constant variance. Errors are also independent as we have filtered to a unique entry per participant, each with their own healthcare regimen. The Quantile Quantile-plot is showing only a bit of deviation towards the tail ends, implying normality is mostly unviolated (@fig-qqplot). This plots compares the actual quantiles to the proposed normal distribution with the red line representing perfect fit.
 
-Overall, the summary report of the linear model does reveal a notable negative association between participant's biological age and the time it takes for them to develop dementia. $\beta_1$ is `r lm_fit$coefficients[2]`, meaning that there is an expected decrease of 43 days in dementia onset time for a 1 year increase in age. If we construct a hypothesis test to examine if the slope of age is 0 (that is, there exists a linear association with time to dementia onset), we obtain significant p-value of `r summary(lm_fit)$coefficients["age", "Pr(>|t|)"]`. 
+Overall, the summary report of the linear model does reveal a notable negative association between participant's biological age and the time it takes for them to develop dementia. $\beta_1$ is `r lm_fit$coefficients[2]`, meaning that there is an expected decrease of 43 days in dementia onset time given a 1 year increase in age. If we construct a hypothesis test to examine if the slope of age is 0 (that is, there exists a linear association with time to dementia onset), we obtain significant p-value of `r summary(lm_fit)$coefficients["age", "Pr(>|t|)"]`. 
 
-```{r fig-residual_plot, fig.cap="The residuals of the linear regression model are mostly randomly scattered", echo=FALSE}
+```{r fig-residual_plot, fig.cap="The residuals of the linear regression model appear to be randomly scattered", echo=FALSE}
 plot(lm_fit$fitted.values, lm_fit$residuals,
      xlab="Fitted values", ylab="Residuals",
      main="Residuals vs. Fitted")
@@ -109,9 +112,9 @@ qqline(lm_fit$residuals, col="red")
 
 # Discussion
 
-Since there is low explainability from this simple linear regression model, more advanced models that include interaction terms and data transformations may reveal more accurate inference of dementia onset using a participant's health profile. Due to lack of linear assumption violations, continuation with more complex parametric techniques seems most appropriate for this dataset. Though biological age has a significant positive association, there is still a lack of ability to predict dementia onset duration. Our limited dataset of dementia participants hinders the generalizability of these regression results. Additionally, since age is a factor that can contribute confounding relationships with other comorbidities, studying interaction terms can help improve the model. 
+Since there is low explainability from this simple linear regression model, more advanced models that include interaction terms and data transformations may reveal more accurate inference of dementia onset using a participant's health profile. Due to lack of linear assumption violations, continuation with more complex parametric techniques seems most appropriate for this dataset. Though biological age has a significant negative association, there is still a lack of ability to predict dementia onset duration. Our limited dataset of dementia participants hinders the generalizability of these regression results. Additionally, since age is a factor that can contribute confounding relationships with other comorbidities, studying interaction terms can help improve the model. 
 
-Ultimately, the issue of predicting time to dementia onset based on only biological age oversimplifies the complicated set of conditions with many possible influences. To consider the impact of varying health stages, the subjective age approach suggested by @kottergruhn2015looking is a reasonable proxy. 
+Ultimately, the issue of predicting time to dementia onset based on only biological age oversimplifies the complicated set of conditions with many possible influences. To consider the impact of varying health stages, the subjective age approach suggested by @kottergruhn2015looking is a reasonable proxy to explore next. 
 
 
 # References
